@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useScenario } from '@/hooks'
 import { useProgressStore } from '@/store'
 import { DialogueStep, CompletionScreen } from '@/components'
+import { trackEvents } from '@/lib/analytics'
 
 interface ConversationClientProps {
   scenarioId: string
@@ -40,9 +41,13 @@ export default function ConversationClient({ scenarioId }: ConversationClientPro
     newRevealed.add(stepId)
     setRevealedSteps(newRevealed)
 
+    // Track dialogue step reveal
+    trackEvents.dialogueStepRevealed(scenarioId, newRevealed.size - 1, totalSteps)
+
     // Check if all steps are revealed
     if (newRevealed.size === totalSteps) {
       setTimeout(() => {
+        trackEvents.conversationCompleted(scenarioId)
         completeScenario(scenarioId)
         setIsCompleted(true)
       }, 500)

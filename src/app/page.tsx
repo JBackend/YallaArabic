@@ -6,6 +6,7 @@ import { useScenario } from '@/hooks'
 import { useProgressStore } from '@/store'
 import { ThemeToggle } from '@/components/ui'
 import { ScenarioCard } from '@/components'
+import { trackEvents } from '@/lib/analytics'
 
 export default function Home() {
   const router = useRouter()
@@ -17,11 +18,13 @@ export default function Home() {
 
   // Click handler for Learn mode - navigates to phrase learning flow
   const handleLearnClick = useCallback((scenarioId: string) => {
+    trackEvents.scenarioLearnClick(scenarioId)
     router.push(`/learn/${scenarioId}`)
   }, [router])
 
   // Click handler for Conversation mode - navigates to conversation practice
   const handleConversationClick = useCallback((scenarioId: string) => {
+    trackEvents.scenarioConversationClick(scenarioId)
     router.push(`/conversation/${scenarioId}`)
   }, [router])
 

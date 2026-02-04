@@ -6,6 +6,7 @@ import { useScenario } from '@/hooks'
 import { useProgressStore } from '@/store'
 import { Button, ProgressDots } from '@/components/ui'
 import { PhraseCard } from '@/components'
+import { trackEvents } from '@/lib/analytics'
 
 interface LearnClientProps {
   scenarioId: string
@@ -30,13 +31,16 @@ export default function LearnClient({ scenarioId }: LearnClientProps) {
     setCurrentScenario(scenarioId)
   }, [scenario, scenarioId, router, setCurrentScenario])
 
-  // Sync with store
-  useEffect(() => {
-    setCurrentPhraseIndex(phraseIndex)
-  }, [phraseIndex, setCurrentPhraseIndex])
-
   // Memoize derived values to prevent recalculation on each render
   const phrases = useMemo(() => scenario?.phrases ?? [], [scenario])
+
+  // Sync with store and track phrase views
+  useEffect(() => {
+    setCurrentPhraseIndex(phraseIndex)
+    if (phrases.length > 0) {
+      trackEvents.phraseViewed(scenarioId, phraseIndex, phrases.length)
+    }
+  }, [phraseIndex, setCurrentPhraseIndex, scenarioId, phrases.length])
   const currentPhrase = useMemo(() => phrases[phraseIndex], [phrases, phraseIndex])
   const isLastPhrase = phraseIndex === phrases.length - 1
   const isFirstPhrase = phraseIndex === 0
@@ -44,11 +48,12 @@ export default function LearnClient({ scenarioId }: LearnClientProps) {
   // Memoize handlers to prevent re-renders in child components
   const handleNext = useCallback(() => {
     if (phraseIndex === phrases.length - 1) {
+      trackEvents.learnCompleted(scenarioId)
       router.push('/')
     } else {
       setPhraseIndex((i) => i + 1)
     }
-  }, [phraseIndex, phrases.length, router])
+  }, [phraseIndex, phrases.length, router, scenarioId])
 
   const handlePrevious = useCallback(() => {
     if (phraseIndex > 0) {

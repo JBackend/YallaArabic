@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Nunito, Noto_Sans_Arabic } from 'next/font/google'
 import { ServiceWorkerRegistration } from '@/components'
+import { GoogleAnalytics } from '@/components/GoogleAnalytics'
 import './globals.css'
 
 const nunito = Nunito({
@@ -53,6 +54,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
       </head>
       <body className="font-sans bg-cream dark:bg-deep-brown text-charcoal dark:text-warm-white min-h-screen safe-area-inset">
+        <GoogleAnalytics />
         {/* Skip link for keyboard navigation */}
         <a
           href="#main-content"
