@@ -1,22 +1,49 @@
 'use client'
 
+import { useRef } from 'react'
 import { useAudio } from '@/hooks/useAudio'
+import { analytics } from '@/lib/analytics'
 
 interface AudioButtonProps {
   audioFile: string
+  phraseId?: string
+  scenarioId?: string
   size?: number
   className?: string
   showLabel?: boolean
 }
 
-export function AudioButton({ audioFile, size = 48, className = '', showLabel = false }: AudioButtonProps) {
+export function AudioButton({
+  audioFile,
+  phraseId,
+  scenarioId,
+  size = 48,
+  className = '',
+  showLabel = false
+}: AudioButtonProps) {
   const { isPlaying, isLoading, error, play, stop } = useAudio(audioFile)
+  const playCount = useRef(0)
+  const playStartTime = useRef<number | null>(null)
 
   const handleClick = () => {
-    if (error) return
+    if (error) {
+      // Track audio error
+      if (phraseId) {
+        analytics.audioError(phraseId, 'load_failed')
+      }
+      return
+    }
+
     if (isPlaying) {
       stop()
     } else {
+      // Track audio play
+      if (phraseId && scenarioId) {
+        const isReplay = playCount.current > 0
+        analytics.audioPlay(phraseId, scenarioId, isReplay)
+        playCount.current++
+        playStartTime.current = Date.now()
+      }
       play()
     }
   }

@@ -1,11 +1,6 @@
-// Google Analytics 4 event tracking
+// Google Analytics 4 - Full Product Analytics Implementation
 
-type GTagEvent = {
-  action: string
-  category: string
-  label?: string
-  value?: number
-}
+const GA_MEASUREMENT_ID = 'G-VS56S49FNK'
 
 // Extend window for gtag
 declare global {
@@ -14,58 +9,213 @@ declare global {
   }
 }
 
-// Track custom events
-export const event = ({ action, category, label, value }: GTagEvent) => {
+// ============================================
+// VIRTUAL PAGEVIEWS
+// ============================================
+
+export const virtualPageview = (path: string, title?: string) => {
   if (typeof window.gtag !== 'undefined') {
-    window.gtag('event', action, {
-      event_category: category,
-      event_label: label,
-      value: value,
+    window.gtag('config', GA_MEASUREMENT_ID, {
+      page_path: path,
+      page_title: title,
     })
   }
 }
 
-// Predefined events for the app
-export const trackEvents = {
-  // Home page
-  scenarioLearnClick: (scenarioId: string) => {
-    event({ action: 'learn_start', category: 'engagement', label: scenarioId })
-  },
-  scenarioConversationClick: (scenarioId: string) => {
-    event({ action: 'conversation_start', category: 'engagement', label: scenarioId })
+// ============================================
+// CUSTOM EVENTS
+// ============================================
+
+type EventParams = Record<string, string | number | boolean | undefined>
+
+export const trackEvent = (eventName: string, params?: EventParams) => {
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('event', eventName, params)
+  }
+}
+
+// ============================================
+// USER PROPERTIES
+// ============================================
+
+export const setUserProperties = (properties: Record<string, string | number | boolean>) => {
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('set', 'user_properties', properties)
+  }
+}
+
+// ============================================
+// PREDEFINED TRACKING FUNCTIONS
+// ============================================
+
+export const analytics = {
+  // ------------------------------------
+  // VIRTUAL PAGEVIEWS
+  // ------------------------------------
+
+  // Learn mode pages
+  learnStart: (scenarioId: string, scenarioTitle: string) => {
+    virtualPageview(`/learn/${scenarioId}`, `Learn: ${scenarioTitle}`)
+    trackEvent('scenario_start', {
+      scenario_id: scenarioId,
+      mode: 'learn',
+    })
   },
 
-  // Learn mode
+  learnPhrase: (scenarioId: string, phraseIndex: number, totalPhrases: number, phraseId: string) => {
+    virtualPageview(
+      `/learn/${scenarioId}/phrase/${phraseIndex + 1}`,
+      `Phrase ${phraseIndex + 1}/${totalPhrases}`
+    )
+    trackEvent('phrase_view', {
+      scenario_id: scenarioId,
+      phrase_id: phraseId,
+      phrase_index: phraseIndex + 1,
+      total_phrases: totalPhrases,
+      progress_pct: Math.round(((phraseIndex + 1) / totalPhrases) * 100),
+    })
+  },
+
+  learnComplete: (scenarioId: string, totalPhrases: number) => {
+    virtualPageview(`/learn/${scenarioId}/complete`, 'Learn Complete')
+    trackEvent('scenario_complete', {
+      scenario_id: scenarioId,
+      mode: 'learn',
+      total_phrases: totalPhrases,
+    })
+  },
+
+  // Conversation mode pages
+  conversationStart: (scenarioId: string, scenarioTitle: string) => {
+    virtualPageview(`/conversation/${scenarioId}`, `Conversation: ${scenarioTitle}`)
+    trackEvent('scenario_start', {
+      scenario_id: scenarioId,
+      mode: 'conversation',
+    })
+  },
+
+  conversationStep: (scenarioId: string, stepIndex: number, totalSteps: number, stepId: string) => {
+    virtualPageview(
+      `/conversation/${scenarioId}/step/${stepIndex + 1}`,
+      `Step ${stepIndex + 1}/${totalSteps}`
+    )
+    trackEvent('dialogue_reveal', {
+      scenario_id: scenarioId,
+      step_id: stepId,
+      step_index: stepIndex + 1,
+      total_steps: totalSteps,
+      progress_pct: Math.round(((stepIndex + 1) / totalSteps) * 100),
+    })
+  },
+
+  conversationComplete: (scenarioId: string, totalSteps: number) => {
+    virtualPageview(`/conversation/${scenarioId}/complete`, 'Conversation Complete')
+    trackEvent('scenario_complete', {
+      scenario_id: scenarioId,
+      mode: 'conversation',
+      total_steps: totalSteps,
+    })
+  },
+
+  // ------------------------------------
+  // AUDIO EVENTS
+  // ------------------------------------
+
+  audioPlay: (phraseId: string, scenarioId: string, isReplay: boolean = false) => {
+    trackEvent('audio_play', {
+      phrase_id: phraseId,
+      scenario_id: scenarioId,
+      is_replay: isReplay,
+    })
+  },
+
+  audioComplete: (phraseId: string, durationMs: number) => {
+    trackEvent('audio_complete', {
+      phrase_id: phraseId,
+      duration_ms: durationMs,
+    })
+  },
+
+  audioError: (phraseId: string, errorType: string) => {
+    trackEvent('audio_error', {
+      phrase_id: phraseId,
+      error_type: errorType,
+    })
+  },
+
+  // ------------------------------------
+  // NAVIGATION / EXIT EVENTS
+  // ------------------------------------
+
+  flowExit: (scenarioId: string, mode: 'learn' | 'conversation', exitPoint: number, totalSteps: number) => {
+    trackEvent('flow_exit', {
+      scenario_id: scenarioId,
+      mode,
+      exit_point: exitPoint,
+      total_steps: totalSteps,
+      progress_pct: Math.round((exitPoint / totalSteps) * 100),
+    })
+  },
+
+  // ------------------------------------
+  // USER ENGAGEMENT
+  // ------------------------------------
+
+  themeChange: (newTheme: 'light' | 'dark' | 'system') => {
+    trackEvent('theme_change', {
+      theme: newTheme,
+    })
+  },
+
+  // ------------------------------------
+  // USER PROPERTIES (call on app load)
+  // ------------------------------------
+
+  updateUserProperties: (props: {
+    scenariosCompleted: number
+    totalPhrasesLearned: number
+    isPwaUser?: boolean
+  }) => {
+    setUserProperties({
+      scenarios_completed: props.scenariosCompleted,
+      total_phrases_learned: props.totalPhrasesLearned,
+      is_pwa_user: props.isPwaUser ?? false,
+    })
+  },
+}
+
+// Legacy exports for backward compatibility (will remove after migration)
+export const trackEvents = {
+  scenarioLearnClick: (scenarioId: string) => {
+    trackEvent('learn_start', { scenario_id: scenarioId })
+  },
+  scenarioConversationClick: (scenarioId: string) => {
+    trackEvent('conversation_start', { scenario_id: scenarioId })
+  },
   phraseViewed: (scenarioId: string, phraseIndex: number, totalPhrases: number) => {
-    event({
-      action: 'phrase_viewed',
-      category: 'learn',
-      label: `${scenarioId}:${phraseIndex + 1}/${totalPhrases}`,
-      value: phraseIndex + 1
+    trackEvent('phrase_viewed', {
+      scenario_id: scenarioId,
+      phrase_index: phraseIndex + 1,
+      total_phrases: totalPhrases,
     })
   },
   learnCompleted: (scenarioId: string) => {
-    event({ action: 'learn_completed', category: 'learn', label: scenarioId })
+    trackEvent('learn_completed', { scenario_id: scenarioId })
   },
-
-  // Conversation mode
   dialogueStepRevealed: (scenarioId: string, stepIndex: number, totalSteps: number) => {
-    event({
-      action: 'dialogue_revealed',
-      category: 'conversation',
-      label: `${scenarioId}:${stepIndex + 1}/${totalSteps}`,
-      value: stepIndex + 1
+    trackEvent('dialogue_revealed', {
+      scenario_id: scenarioId,
+      step_index: stepIndex + 1,
+      total_steps: totalSteps,
     })
   },
   conversationCompleted: (scenarioId: string) => {
-    event({ action: 'conversation_completed', category: 'conversation', label: scenarioId })
+    trackEvent('conversation_completed', { scenario_id: scenarioId })
   },
-
-  // Audio
   audioPlayed: (phraseId: string) => {
-    event({ action: 'audio_played', category: 'audio', label: phraseId })
+    trackEvent('audio_played', { phrase_id: phraseId })
   },
   audioError: (phraseId: string) => {
-    event({ action: 'audio_error', category: 'audio', label: phraseId })
+    trackEvent('audio_error', { phrase_id: phraseId })
   },
 }

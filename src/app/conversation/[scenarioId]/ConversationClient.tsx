@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useScenario } from '@/hooks'
 import { useProgressStore } from '@/store'
 import { DialogueStep, CompletionScreen } from '@/components'
-import { trackEvents } from '@/lib/analytics'
+import { analytics } from '@/lib/analytics'
 
 interface ConversationClientProps {
   scenarioId: string
@@ -18,15 +18,23 @@ export default function ConversationClient({ scenarioId }: ConversationClientPro
 
   const [revealedSteps, setRevealedSteps] = useState<Set<string>>(new Set())
   const [isCompleted, setIsCompleted] = useState(false)
+  const hasTrackedStart = useRef(false)
 
   const scenario = getScenarioById(scenarioId)
 
-  // Redirect if scenario not found
+  // Redirect if scenario not found, track start
   useEffect(() => {
     if (!scenario) {
       router.replace('/')
+      return
     }
-  }, [scenario, router])
+
+    // Track conversation start (once)
+    if (!hasTrackedStart.current) {
+      analytics.conversationStart(scenarioId, scenario.title)
+      hasTrackedStart.current = true
+    }
+  }, [scenario, router, scenarioId])
 
   if (!scenario) {
     return null
@@ -36,18 +44,18 @@ export default function ConversationClient({ scenarioId }: ConversationClientPro
   const totalSteps = dialogueSteps.length
   const revealedCount = revealedSteps.size
 
-  const handleReveal = (stepId: string) => {
+  const handleReveal = (stepId: string, stepIndex: number) => {
     const newRevealed = new Set(revealedSteps)
     newRevealed.add(stepId)
     setRevealedSteps(newRevealed)
 
-    // Track dialogue step reveal
-    trackEvents.dialogueStepRevealed(scenarioId, newRevealed.size - 1, totalSteps)
+    // Track dialogue step with virtual pageview
+    analytics.conversationStep(scenarioId, stepIndex, totalSteps, stepId)
 
     // Check if all steps are revealed
     if (newRevealed.size === totalSteps) {
       setTimeout(() => {
-        trackEvents.conversationCompleted(scenarioId)
+        analytics.conversationComplete(scenarioId, totalSteps)
         completeScenario(scenarioId)
         setIsCompleted(true)
       }, 500)
@@ -59,6 +67,8 @@ export default function ConversationClient({ scenarioId }: ConversationClientPro
   }
 
   const handleBack = () => {
+    // Track flow exit
+    analytics.flowExit(scenarioId, 'conversation', revealedCount, totalSteps)
     router.push('/')
   }
 
@@ -134,7 +144,8 @@ export default function ConversationClient({ scenarioId }: ConversationClientPro
                 step={step}
                 phrase={phrase}
                 isRevealed={revealedSteps.has(step.id)}
-                onReveal={() => handleReveal(step.id)}
+                onReveal={() => handleReveal(step.id, index)}
+                scenarioId={scenarioId}
               />
             )
           })}

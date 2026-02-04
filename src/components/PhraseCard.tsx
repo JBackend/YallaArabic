@@ -6,10 +6,11 @@ import { AudioButton } from './AudioButton'
 
 interface PhraseCardProps {
   phrase: Phrase
+  scenarioId?: string
   className?: string
 }
 
-export function PhraseCard({ phrase, className = '' }: PhraseCardProps) {
+export function PhraseCard({ phrase, scenarioId, className = '' }: PhraseCardProps) {
   return (
     <Card className={`animate-fade-in ${className}`}>
       <div className="space-y-5 py-4">
@@ -48,7 +49,12 @@ export function PhraseCard({ phrase, className = '' }: PhraseCardProps) {
 
         {/* Audio button - centered with hint */}
         <div className="flex flex-col items-center gap-2 pt-2">
-          <AudioButton audioFile={phrase.audioFile} size={56} />
+          <AudioButton
+            audioFile={phrase.audioFile}
+            phraseId={phrase.id}
+            scenarioId={scenarioId}
+            size={56}
+          />
           <span className="text-xs text-warm-gray dark:text-muted-sand">
             Tap to hear pronunciation
           </span>

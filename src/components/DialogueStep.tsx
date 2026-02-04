@@ -9,9 +9,10 @@ interface DialogueStepProps {
   phrase: Phrase
   isRevealed: boolean
   onReveal: () => void
+  scenarioId?: string
 }
 
-export function DialogueStep({ step, phrase, isRevealed, onReveal }: DialogueStepProps) {
+export function DialogueStep({ step, phrase, isRevealed, onReveal, scenarioId }: DialogueStepProps) {
   const isUser = step.speaker === 'user'
 
   return (
@@ -90,7 +91,12 @@ export function DialogueStep({ step, phrase, isRevealed, onReveal }: DialogueSte
 
             {/* Audio button with label */}
             <div className={`pt-2 flex items-center gap-3 ${isUser ? 'justify-end' : ''}`}>
-              <AudioButton audioFile={phrase.audioFile} size={44} />
+              <AudioButton
+                audioFile={phrase.audioFile}
+                phraseId={phrase.id}
+                scenarioId={scenarioId}
+                size={44}
+              />
               <span className="text-xs text-warm-gray dark:text-muted-sand">
                 Tap to hear
               </span>
