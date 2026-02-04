@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import Script from 'next/script'
 import { Nunito, Noto_Sans_Arabic } from 'next/font/google'
 import { ServiceWorkerRegistration } from '@/components'
 import { GoogleAnalytics } from '@/components/GoogleAnalytics'
@@ -52,6 +53,10 @@ export default function RootLayout({
     <html lang="en" className={`${nunito.variable} ${notoSansArabic.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <Script
+          src="https://tally.so/widgets/embed.js"
+          strategy="lazyOnload"
+        />
       </head>
       <body className="font-sans bg-cream dark:bg-deep-brown text-charcoal dark:text-warm-white min-h-screen safe-area-inset">
         <GoogleAnalytics />

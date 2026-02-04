@@ -59,3 +59,32 @@ export interface AudioState {
   isLoading: boolean
   error: string | null
 }
+
+/**
+ * Tally popup options
+ */
+export interface TallyPopupOptions {
+  layout?: 'default' | 'modal'
+  width?: number
+  emoji?: {
+    text: string
+    animation: 'none' | 'wave' | 'tada' | 'heart-beat' | 'spin' | 'flash' | 'bounce' | 'rubber-band' | 'head-shake'
+  }
+  autoClose?: number
+  hiddenFields?: Record<string, string>
+  onOpen?: () => void
+  onClose?: () => void
+  onSubmit?: (payload: unknown) => void
+}
+
+/**
+ * Global Tally object (loaded via external script)
+ */
+declare global {
+  interface Window {
+    Tally?: {
+      openPopup: (formId: string, options?: TallyPopupOptions) => void
+      closePopup: (formId: string) => void
+    }
+  }
+}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import type { Scenario } from '@/types'
 import { Button, Card } from '@/components/ui'
 
@@ -8,7 +9,20 @@ interface CompletionScreenProps {
   onContinue: () => void
 }
 
+const TALLY_FORM_ID = 'aQdPRb'
+
 export function CompletionScreen({ scenario, onContinue }: CompletionScreenProps) {
+  const handleFeedbackClick = useCallback(() => {
+    window.Tally?.openPopup(TALLY_FORM_ID, {
+      emoji: { text: '👋', animation: 'wave' },
+      autoClose: 3000,
+      hiddenFields: {
+        scenario: scenario.id,
+        scenarioTitle: scenario.title,
+      },
+    })
+  }, [scenario.id, scenario.title])
+
   return (
     <div className="animate-fade-in flex flex-col items-center justify-center min-h-[60vh] p-8 text-center" role="alert" aria-live="polite">
       {/* Celebration icon */}
@@ -51,10 +65,16 @@ export function CompletionScreen({ scenario, onContinue }: CompletionScreenProps
             </span>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-4 space-y-3">
             <Button onClick={onContinue} size="lg" className="w-full">
               Continue
             </Button>
+            <button
+              onClick={handleFeedbackClick}
+              className="w-full text-sm text-warm-gray dark:text-muted-sand hover:text-terracotta dark:hover:text-soft-terracotta transition-colors"
+            >
+              Share Feedback 👋
+            </button>
           </div>
         </div>
       </Card>

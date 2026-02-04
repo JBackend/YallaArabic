@@ -8,6 +8,8 @@ import { ThemeToggle } from '@/components/ui'
 import { ScenarioCard } from '@/components'
 import { trackEvents } from '@/lib/analytics'
 
+const TALLY_FORM_ID = 'aQdPRb'
+
 export default function Home() {
   const router = useRouter()
   const { getScenarios } = useScenario()
@@ -35,6 +37,16 @@ export default function Home() {
 
   // Memoize completed status lookup for better performance
   const completedSet = useMemo(() => new Set(completedScenarios), [completedScenarios])
+
+  const handleFeedbackClick = useCallback(() => {
+    window.Tally?.openPopup(TALLY_FORM_ID, {
+      emoji: { text: '👋', animation: 'wave' },
+      autoClose: 3000,
+      hiddenFields: {
+        page: 'home',
+      },
+    })
+  }, [])
 
   return (
     <main id="main-content" className="min-h-screen p-6 md:p-8">
@@ -82,6 +94,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="mt-12 text-center text-xs text-warm-gray/60 dark:text-muted-sand/60">
         <p>Learn practical phrases for Dubai &amp; UAE</p>
+        <button
+          onClick={handleFeedbackClick}
+          className="mt-2 hover:text-terracotta dark:hover:text-soft-terracotta transition-colors underline"
+        >
+          Give us feedback
+        </button>
       </footer>
     </main>
   )
