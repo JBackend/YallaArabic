@@ -6,11 +6,11 @@ import { useScenario } from '@/hooks'
 import { useProgressStore } from '@/store'
 import { DialogueStep, CompletionScreen } from '@/components'
 
-interface PracticeClientProps {
+interface ConversationClientProps {
   scenarioId: string
 }
 
-export default function PracticeClient({ scenarioId }: PracticeClientProps) {
+export default function ConversationClient({ scenarioId }: ConversationClientProps) {
   const router = useRouter()
   const { getScenarioById, getPhraseById } = useScenario()
   const { completeScenario } = useProgressStore()
@@ -54,7 +54,7 @@ export default function PracticeClient({ scenarioId }: PracticeClientProps) {
   }
 
   const handleBack = () => {
-    router.push(`/learn/${scenarioId}`)
+    router.push('/')
   }
 
   if (isCompleted) {
@@ -68,7 +68,7 @@ export default function PracticeClient({ scenarioId }: PracticeClientProps) {
         <button
           onClick={handleBack}
           className="p-2 -ml-2 rounded-full hover:bg-sand dark:hover:bg-warm-charcoal transition-colors focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2"
-          aria-label="Go back to learning mode"
+          aria-label="Go back to home"
         >
           <svg className="w-6 h-6 text-charcoal dark:text-warm-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -76,7 +76,7 @@ export default function PracticeClient({ scenarioId }: PracticeClientProps) {
         </button>
         <div className="flex-1">
           <h1 className="font-semibold text-charcoal dark:text-warm-white">
-            Practice: {scenario.title}
+            Conversation: {scenario.title}
           </h1>
           <p className="text-xs text-warm-gray dark:text-muted-sand">
             Tap cards to reveal phrases

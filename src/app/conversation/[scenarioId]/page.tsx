@@ -1,5 +1,5 @@
 import { scenarios } from '@/data/scenarios'
-import PracticeClient from './PracticeClient'
+import ConversationClient from './ConversationClient'
 
 // Generate static params for all scenarios
 export function generateStaticParams() {
@@ -8,6 +8,6 @@ export function generateStaticParams() {
   }))
 }
 
-export default function PracticePage({ params }: { params: { scenarioId: string } }) {
-  return <PracticeClient scenarioId={params.scenarioId} />
+export default function ConversationPage({ params }: { params: { scenarioId: string } }) {
+  return <ConversationClient scenarioId={params.scenarioId} />
 }

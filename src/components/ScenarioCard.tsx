@@ -2,46 +2,41 @@
 
 import { memo, useCallback } from 'react'
 import type { Scenario } from '@/types'
-import { Card } from '@/components/ui'
+import { Button, Card } from '@/components/ui'
 
 interface ScenarioCardProps {
   scenario: Scenario
   isCompleted: boolean
-  onClick: (scenarioId: string) => void
+  onLearnClick: (scenarioId: string) => void
+  onConversationClick: (scenarioId: string) => void
+  learnedPhrasesCount: number
 }
 
 /**
  * ScenarioCard - Memoized for performance optimization
  * Prevents re-renders when parent component updates but props haven't changed
  */
-export const ScenarioCard = memo(function ScenarioCard({ scenario, isCompleted, onClick }: ScenarioCardProps) {
-  // Memoize click handler to use stable reference
-  const handleClick = useCallback(() => {
-    onClick(scenario.id)
-  }, [onClick, scenario.id])
+export const ScenarioCard = memo(function ScenarioCard({
+  scenario,
+  isCompleted,
+  onLearnClick,
+  onConversationClick,
+  learnedPhrasesCount,
+}: ScenarioCardProps) {
+  // Memoize click handlers to use stable references
+  const handleLearnClick = useCallback(() => {
+    onLearnClick(scenario.id)
+  }, [onLearnClick, scenario.id])
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onClick(scenario.id)
-    }
-  }, [onClick, scenario.id])
+  const handleConversationClick = useCallback(() => {
+    onConversationClick(scenario.id)
+  }, [onConversationClick, scenario.id])
 
   return (
     <Card
       className={`
-        cursor-pointer
-        transition-transform duration-card
-        hover:scale-[1.02]
-        active:scale-[0.98]
-        focus-visible:ring-2 focus-visible:ring-terracotta focus-visible:ring-offset-2
         ${isCompleted ? 'opacity-80' : ''}
       `}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-      aria-label={`${scenario.title}: ${scenario.description}. ${scenario.phrases.length} phrases. ${isCompleted ? 'Completed.' : 'Not completed.'}`}
-      onKeyDown={handleKeyDown}
     >
       <div className="flex items-center gap-4">
         {/* Icon */}
@@ -58,7 +53,7 @@ export const ScenarioCard = memo(function ScenarioCard({ scenario, isCompleted, 
             {scenario.description}
           </p>
           <p className="text-xs text-warm-gray/70 dark:text-muted-sand/70 mt-1">
-            {scenario.phrases.length} phrases
+            {learnedPhrasesCount}/{scenario.phrases.length} phrases
           </p>
         </div>
 
@@ -98,6 +93,26 @@ export const ScenarioCard = memo(function ScenarioCard({ scenario, isCompleted, 
             </svg>
           )}
         </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-2 mt-4">
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleLearnClick}
+          aria-label={`Learn ${scenario.title}`}
+        >
+          Learn
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleConversationClick}
+          aria-label={`Practice conversation for ${scenario.title}`}
+        >
+          Conversation
+        </Button>
       </div>
     </Card>
   )

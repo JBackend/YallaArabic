@@ -7,6 +7,8 @@ interface ProgressStore extends UserProgress {
   completeScenario: (scenarioId: string) => void
   setCurrentScenario: (scenarioId: string | null) => void
   setCurrentPhraseIndex: (index: number) => void
+  markPhraseAsLearned: (scenarioId: string, phraseId: string) => void
+  getLearnedPhrasesCount: (scenarioId: string) => number
   resetProgress: () => void
 }
 
@@ -15,6 +17,7 @@ const initialState: UserProgress = {
   currentScenario: null,
   currentPhraseIndex: 0,
   lastActiveAt: Date.now(),
+  learnedPhrases: {},
 }
 
 export const useProgressStore = create<ProgressStore>()(
@@ -45,6 +48,25 @@ export const useProgressStore = create<ProgressStore>()(
           currentPhraseIndex: index,
           lastActiveAt: Date.now(),
         })
+      },
+
+      markPhraseAsLearned: (scenarioId: string, phraseId: string) => {
+        const { learnedPhrases } = get()
+        const scenarioPhrases = learnedPhrases[scenarioId] || []
+        if (!scenarioPhrases.includes(phraseId)) {
+          set({
+            learnedPhrases: {
+              ...learnedPhrases,
+              [scenarioId]: [...scenarioPhrases, phraseId],
+            },
+            lastActiveAt: Date.now(),
+          })
+        }
+      },
+
+      getLearnedPhrasesCount: (scenarioId: string) => {
+        const { learnedPhrases } = get()
+        return learnedPhrases[scenarioId]?.length || 0
       },
 
       resetProgress: () => {

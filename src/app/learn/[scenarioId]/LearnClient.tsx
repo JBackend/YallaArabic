@@ -44,11 +44,11 @@ export default function LearnClient({ scenarioId }: LearnClientProps) {
   // Memoize handlers to prevent re-renders in child components
   const handleNext = useCallback(() => {
     if (phraseIndex === phrases.length - 1) {
-      router.push(`/practice/${scenarioId}`)
+      router.push('/')
     } else {
       setPhraseIndex((i) => i + 1)
     }
-  }, [phraseIndex, phrases.length, router, scenarioId])
+  }, [phraseIndex, phrases.length, router])
 
   const handlePrevious = useCallback(() => {
     if (phraseIndex > 0) {
@@ -111,8 +111,8 @@ export default function LearnClient({ scenarioId }: LearnClientProps) {
             </svg>
             Previous
           </Button>
-          <Button onClick={handleNext} className="flex-1" aria-label={isLastPhrase ? 'Go to practice mode' : 'Go to next phrase'}>
-            {isLastPhrase ? 'Practice' : 'Next'}
+          <Button onClick={handleNext} className="flex-1" aria-label={isLastPhrase ? 'Return to scenarios' : 'Go to next phrase'}>
+            {isLastPhrase ? 'Done' : 'Next'}
             <svg className="w-5 h-5 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

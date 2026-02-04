@@ -10,15 +10,25 @@ import { ScenarioCard } from '@/components'
 export default function Home() {
   const router = useRouter()
   const { getScenarios } = useScenario()
-  const { completedScenarios } = useProgressStore()
+  const { completedScenarios, learnedPhrases } = useProgressStore()
 
   // Memoize scenarios to prevent recalculation on each render
   const scenarios = useMemo(() => getScenarios(), [getScenarios])
 
-  // Memoize click handler to prevent creating new functions on each render
-  const handleScenarioClick = useCallback((scenarioId: string) => {
+  // Click handler for Learn mode - navigates to phrase learning flow
+  const handleLearnClick = useCallback((scenarioId: string) => {
     router.push(`/learn/${scenarioId}`)
   }, [router])
+
+  // Click handler for Conversation mode - navigates to conversation practice
+  const handleConversationClick = useCallback((scenarioId: string) => {
+    router.push(`/conversation/${scenarioId}`)
+  }, [router])
+
+  // Helper to get learned phrases count for a scenario
+  const getLearnedCount = useCallback((scenarioId: string) => {
+    return learnedPhrases[scenarioId]?.length || 0
+  }, [learnedPhrases])
 
   // Memoize completed status lookup for better performance
   const completedSet = useMemo(() => new Set(completedScenarios), [completedScenarios])
@@ -57,7 +67,9 @@ export default function Home() {
               <ScenarioCard
                 scenario={scenario}
                 isCompleted={completedSet.has(scenario.id)}
-                onClick={handleScenarioClick}
+                onLearnClick={handleLearnClick}
+                onConversationClick={handleConversationClick}
+                learnedPhrasesCount={getLearnedCount(scenario.id)}
               />
             </li>
           ))}

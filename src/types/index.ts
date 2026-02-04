@@ -41,6 +41,7 @@ export interface UserProgress {
   currentScenario: string | null
   currentPhraseIndex: number
   lastActiveAt: number
+  learnedPhrases: Record<string, string[]>
 }
 
 /**
