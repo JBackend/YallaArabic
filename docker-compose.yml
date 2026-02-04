@@ -1,0 +1,31 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arabic-dev-1
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --hostname 0.0.0.0
+    profiles:
+      - dev
+
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arabic-prod-1
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    profiles:
+      - prod
+
+volumes:
+  node_modules:

@@ -1,0 +1,38 @@
+{
+  "name": "gulf-arabic-basics",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "docker:build": "docker compose build",
+    "docker:dev": "docker compose --profile dev up -d",
+    "docker:dev:down": "docker compose --profile dev down",
+    "docker:prod": "docker compose --profile prod up -d",
+    "docker:prod:down": "docker compose --profile prod down",
+    "docker:logs": "docker logs -f arabic-dev-1",
+    "docker:shell": "docker exec -it arabic-dev-1 /bin/sh"
+  },
+  "dependencies": {
+    "next": "14.2.5",
+    "react": "^18",
+    "react-dom": "^18",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@linear/sdk": "^73.0.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.5",
+    "graphql": "^16.12.0",
+    "graphql-request": "^7.4.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
