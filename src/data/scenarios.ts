@@ -138,6 +138,28 @@ export const scenarios: Scenario[] = [
       { id: 'step-8', speaker: 'user', phraseId: 'shukran', prompt: 'You thank them' },
     ],
   },
+  {
+    id: 'numbers-money',
+    title: 'Numbers & Money',
+    description: 'Count, pay, and haggle like a local',
+    icon: '💰',
+    phrases: [
+      { id: 'kam', arabic: 'كم؟', transliteration: 'Kam?', meaning: 'How much?', audioFile: 'kam.mp3' },
+      { id: 'ghali', arabic: 'غالي', transliteration: 'Ghāli', meaning: 'Expensive / Too much', audioFile: 'ghali.mp3' },
+      { id: 'al-hisab', arabic: 'الحساب', transliteration: 'Al-ḥisāb', meaning: 'The bill / check', audioFile: 'al-hisab.mp3' },
+      { id: 'wahid-ithnayn-thalatha', arabic: 'واحد، اثنين، ثلاثة', transliteration: 'Wāḥid, ithnain, thalātha', meaning: 'One, two, three', audioFile: 'wahid-ithnayn-thalatha.mp3' },
+      { id: 'fils', arabic: 'فلس', transliteration: 'Fils', meaning: 'Small change / coins', audioFile: 'fils.mp3' },
+      { id: 'fakkah', arabic: 'فكّة', transliteration: 'Fakkah', meaning: 'Change (money back)', audioFile: 'fakkah.mp3' },
+    ],
+    dialogue: [
+      { id: 'step-1', speaker: 'user', phraseId: 'kam', prompt: 'You ask the shopkeeper the price' },
+      { id: 'step-2', speaker: 'local', phraseId: 'wahid-ithnayn-thalatha', prompt: 'They count out the price' },
+      { id: 'step-3', speaker: 'user', phraseId: 'ghali', prompt: 'You say it\'s too expensive' },
+      { id: 'step-4', speaker: 'local', phraseId: 'al-hisab', prompt: 'They hand you the bill' },
+      { id: 'step-5', speaker: 'user', phraseId: 'fils', prompt: 'You ask about small change' },
+      { id: 'step-6', speaker: 'local', phraseId: 'fakkah', prompt: 'They give you change back' },
+    ],
+  },
 ]
 
 export function getScenarios(): Scenario[] {
